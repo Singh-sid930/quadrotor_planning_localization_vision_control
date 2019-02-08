@@ -62,30 +62,35 @@ I = params.I;
 grav =  params.grav;
 mass =   params.mass;
 
-kd        = [1;1;1];
-kp        = [1;1;1];
+kp        = [15;15;15]
+kd        = [15;15;13];
 
 
 a_com     = acc_des - kd.*(vel_cur-vel_des) - kp.*(pos_cur-pos_des);
 u1        = (a_com(3)+grav)*(mass);
-disp(u1)
 
-%theta_des = 1/params.grav * ( a_com(1)*Cos(qd{qn}.yaw_des) + a_com(2)*Sin(qd{qn}.yaw_des));
-%%Phi_des = 1/params.grav* (a_com(1)*Cos(qd{qn}.yaw_des) + a_com(2)*Sin(qd{qn}.yaw_des));
-%u2 = zeros(3,1);
-%Kp1,kp2,kp3,kd1,kd2,kd3 = 0;
-%u2 = params.I * {(kp1(qd{qn}.euler(1)-Phi_des)-Kd1(qd{qn}.omega(1)-0)),(kp2(qd{qn}.euler(2)-theta_des)-kd2(qd{qn}.omega(2)-0)),(kp3(qd{qn}.euler(3)-qd{qn}.yaw)-kd3(qd{qn}.omega(3)-0))};
+
+theta_des = 1/grav * (a_com(1)*cos(yaw_des) + a_com(2)*sin(yaw_des));
+phi_des = 1/grav * (a_com(1)*sin(yaw_des) - a_com(2)*cos(yaw_des));
+
+orient_vec = [orient_cur(1)-phi_des;orient_cur(2)-theta_des;orient_cur(3)-yaw_des];
+omega_vec  = [omega_cur(1);omega_cur(2);omega_cur(3)];
+
+kp1 = -1.*[500;500;500];
+kd1 = -1.*[30;50;50];
+u2 = I * (kp1.*(orient_vec)+kd1.*(omega_vec));
 
 %
 %
 %
-u    = zeros(4,1); % control input u, you should fill this in
+%u    = zeros(4,1); % control input u, you should fill this in
                   
 % Thrust
 F    = u1;       % This should be F = u(1) from the project handout
 
 % Moment
-M    = u(2:4);     % note: params.I has the moment of inertia
+M    = u2;     % note: params.I has the moment of inertia
+
 
 % =================== Your code ends here ===================
 

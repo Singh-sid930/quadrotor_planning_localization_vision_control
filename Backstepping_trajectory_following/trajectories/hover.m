@@ -10,7 +10,7 @@ function [desired_state] = hover(t, qn)
 if t == 0
     pos = [0;0;0];
 else
-    pos = [0;0;2];
+    pos = [0;(t/20)*2;(t/20)*2];
 end 
 
 vel = [0; 0; 0];
