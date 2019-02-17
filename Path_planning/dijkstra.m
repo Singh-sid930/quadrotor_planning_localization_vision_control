@@ -43,7 +43,6 @@ end
 
 cost_mat(start_sub(1),start_sub(2),start_sub(3)) = 0;
 
-%iter = 1;
 
 while true
     
@@ -71,7 +70,7 @@ while true
         
     
         if nebr_I == curr_I
-            %disp("skipped");
+            %disp("original neighbour skipped");
             continue;
         end
         
@@ -92,16 +91,10 @@ while true
         end
         
     end 
-    %disp(iter);
-    %disp(curr_sub);
+    
+
     cost_mat(curr_sub(1),curr_sub(2),curr_sub(3)) = 50000;
     visit_mat(curr_sub(1),curr_sub(2),curr_sub(3)) = 1;
-    %iter = iter + 1;
-  
-  %if iter == 100
-   % break;
-  %end
-    
     
 end
 
@@ -121,15 +114,12 @@ while true
     path(i,:) = ind2pos(map,n);
     [p,q,r] = ind2sub(size_map,n);
     n = parent_path(p,q,r);
-    %disp(n);
     i=i+1; 
 end 
 
 if nargin < 4
     astar = false;
 end
-%disp(path);
-%num_expanded = sum(parent_path~=0);
 
 
 
