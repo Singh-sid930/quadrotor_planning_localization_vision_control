@@ -18,8 +18,10 @@ function [path, num_expanded] = dijkstra(map, start, goal, astar)
 %   start   - 1x3 vector of the starting coordinates [x,y,z]
 %   goal:   - 1x3 vector of the goal coordinates [x,y,z]
 %   astar   - boolean use astar or dijkstra
-
-size_map    =   size(map.occgrid);
+size_map1   =   size(map.occgrid);
+disp(size_map1);
+size_map    =   [size(map.occgrid,1),size(map.occgrid,2),size(map.occgrid,3)];
+disp(size_map);
 cost_mat    = 50000*ones(size_map(1),size_map(2),size_map(3));
 parent_path = ones(size_map(1),size_map(2),size_map(3));
 visit_mat    = zeros(size_map(1),size_map(2),size_map(3));
@@ -30,6 +32,8 @@ start_sub   =   pos2sub(map,start);
 start_ind   =   sub2ind(size_map,start_sub(1),start_sub(2),start_sub(3));
 start_val   =   map.occgrid(start_sub(1),start_sub(2),start_sub(3));
 goal_val    =   map.occgrid(goal_sub(1),goal_sub(2),goal_sub(3));
+
+expanded_nodes = 0;
 
 if start_val ==1
     disp("the start position is in obstacle, assign new start position");
@@ -43,6 +47,7 @@ end
 
 cost_mat(start_sub(1),start_sub(2),start_sub(3)) = 0;
 
+%iter = 1;
 
 while true
     
@@ -53,8 +58,8 @@ while true
     curr_sub    = [ii,jj,k];
     
     if curr_I == goal_ind
-        X = ["goal has been found at " , curr_I];
-        disp(X);
+        %X = ["goal has been found at " , curr_I];
+        %disp(X);
         break;
     end
     
@@ -70,14 +75,22 @@ while true
         
     
         if nebr_I == curr_I
-            %disp("original neighbour skipped");
+            %disp("skipped");
             continue;
         end
         
         
         if map.occgrid(nebr_list(i,1),nebr_list(i,2),nebr_list(i,3))==0
             
-            cost = v + norm(sub2pos(map,nebr_list(i,:)) - sub2pos(map,curr_sub)) + norm(goal - sub2pos(map,nebr_list(i,:)));
+            expanded_nodes = expanded_nodes + 1;
+            
+            if astar == true
+                cost = v + norm(sub2pos(map,nebr_list(i,:)) - sub2pos(map,curr_sub)) + norm(goal - sub2pos(map,nebr_list(i,:)));
+            end
+            
+            if astar == false
+                cost = v + norm(sub2pos(map,nebr_list(i,:)) - sub2pos(map,curr_sub));
+            end
             
             if cost < cost_mat(nebr_list(i,1),nebr_list(i,2),nebr_list(i,3))
                 
@@ -91,10 +104,8 @@ while true
         end
         
     end 
-    
-
     cost_mat(curr_sub(1),curr_sub(2),curr_sub(3)) = 50000;
-    visit_mat(curr_sub(1),curr_sub(2),curr_sub(3)) = 1;
+    visit_mat(curr_sub(1),curr_sub(2),curr_sub(3)) = 1;   
     
 end
 
@@ -102,8 +113,6 @@ end
 
 
 n = curr_I;
-disp(start_ind);
-
 i =1;
 while true 
     
@@ -114,12 +123,21 @@ while true
     path(i,:) = ind2pos(map,n);
     [p,q,r] = ind2sub(size_map,n);
     n = parent_path(p,q,r);
+    %disp(n);
     i=i+1; 
 end 
 
 if nargin < 4
     astar = false;
 end
+[m,n] = size(path);
+path(1,:) = goal;
+path(m+1,:) = start;
+path = flipud(path);
+%disp(path);
+
+
+num_expanded = expanded_nodes;
 
 
 
